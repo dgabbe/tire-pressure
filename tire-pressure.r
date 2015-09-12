@@ -14,14 +14,29 @@ inflation_data <- function(wheel_load_lbs, tire_size_mm) {
   return(ltp)
 }
 
+# Extra light casings need an extra 10% pressure to prevent the casing threads from breaking.
+#
 bike_tire_pressures <- function(rider_weight_lbs=100,
                                 bike_weight_lbs=15,
                                 load_lbs=2,
-                                tire_casing_compensation=1,
+                                front_tire_casing_compensation=1,
                                 front_tire_size_mm=28,
+                                rear_tire_casing_compensation=1,
                                 rear_tire_size_mm=28,
                                 front_distribution=0.5){
-
+  total_weight <- rider_weight_lbs + bike_weight_lbs + load_lbs
+  front_weight <- total_weight * front_distribution
+  rear_weight <- total_weight * (1 - front_distribution)
+  front <- c(front_weight,
+              tirePressure_psi(front_weight, front_tire_size_mm) * front_tire_casing_compensation
+             )
+  rear <- c(rear_weight,
+            tirePressure_psi(rear_weight, rear_tire_size_mm) * rear_tire_casing_compensation
+             )
+  pressures <- data.frame(colnames("Weight", "Pressure"),
+                          front_row = front,
+                          rear_row = rear)
+  return(pressures)
 }
 
 inflation_chart <- matrix(ncol=3, byrow=TRUE,
