@@ -5,12 +5,12 @@
 # Weight_lbs is the load on the bicycle wheel and typcially 40 - 60 percent
 # of the total weight of the rider, bike and carried items.
 #
-tirePressure_psi <- function(weight_lbs, tireSize_mm) {
+compute_tire_pressure_psi <- function(weight_lbs, tireSize_mm) {
   return(153.6 * weight_lbs / tireSize_mm**1.5785 - 7.1685)
 }
 
-inflation_data <- function(wheel_load_lbs, tire_size_mm) {
-  ltp <- c(wheel_load_lbs, tire_size_mm, tirePressure_psi(wheel_load_lbs, tire_size_mm))
+inflation_datum <- function(wheel_load_lbs, tire_size_mm) {
+  ltp <- c(wheel_load_lbs, tire_size_mm, compute_tire_pressure_psi(wheel_load_lbs, tire_size_mm))
   return(ltp)
 }
 
@@ -28,10 +28,10 @@ bike_tire_pressures <- function(rider_weight_lbs=100,
   front_weight <- total_weight * front_distribution
   rear_weight <- total_weight * (1 - front_distribution)
   front <- c(front_weight,
-              tirePressure_psi(front_weight, front_tire_size_mm) * front_tire_casing_compensation
+              compute_tire_pressure_psi(front_weight, front_tire_size_mm) * front_tire_casing_compensation
              )
   rear <- c(rear_weight,
-            tirePressure_psi(rear_weight, rear_tire_size_mm) * rear_tire_casing_compensation
+            compute_tire_pressure_psi(rear_weight, rear_tire_size_mm) * rear_tire_casing_compensation
              )
   pressures <- data.frame(colnames("Weight", "Pressure"),
                           front_row = front,
@@ -39,7 +39,7 @@ bike_tire_pressures <- function(rider_weight_lbs=100,
   return(pressures)
 }
 
-inflation_chart <- matrix(ncol=3, byrow=TRUE,
+inflation_data <- matrix(ncol=3, byrow=TRUE,
                            dimnames=list(c(), c("wheel_load_lbs", "tire_size_mm", "tire_pressure_psi")))
 
 # Based on the Bicycle Quarterly chart which was laid in kilograms
@@ -50,13 +50,13 @@ tire_sizes_mm <- c(23, 25, 28, 32, 35, 42, 48)
 
 for(wll in wheel_loads_lbs){
   for(ts in tire_sizes_mm){
-    inflation_chart <- rbind(inflation_chart, inflation_data(wll, ts))
+    inflation_data <- rbind(inflation_data, inflation_datum(wll, ts))
   }
 }
 
-inflation_chart <- as.data.frame(inflation_chart)
+inflation_data <- as.data.frame(inflation_data)
 
-inflation_graphic <- ggplot(inflation_chart, aes(x=wheel_load_lbs, y=tire_pressure_psi, group=tire_size_mm, color=tire_size_mm)) +
+inflation_graphic <- ggplot(inflation_data, aes(x=wheel_load_lbs, y=tire_pressure_psi, group=tire_size_mm, color=tire_size_mm)) +
   geom_line()
 
 
