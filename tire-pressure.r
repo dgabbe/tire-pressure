@@ -33,9 +33,13 @@ bike_tire_pressures <- function(rider_weight_lbs=100,
   rear <- c(rear_weight,
             compute_tire_pressure_psi(rear_weight, rear_tire_size_mm) * rear_tire_casing_compensation
              )
-  pressures <- data.frame(colnames("Weight", "Pressure"),
-                          front_row = front,
-                          rear_row = rear)
+#  pressures <- data.frame( front_row = front, rear_row = rear)
+  pressures <- matrix(front, ncol=2, byrow=TRUE)
+  #       dimnames=list(c("Front", "Rear"), c("Weight", "Pressure")))
+  pressures <- rbind(pressures, rear)
+  pressures <- as.data.frame(pressures)
+  colnames(pressures) <- c("Weight", "Pressure")
+  rownames(pressures) <- c("Front", "Rear")
   return(pressures)
 }
 
@@ -55,6 +59,7 @@ for(wll in wheel_loads_lbs){
 }
 
 inflation_data <- as.data.frame(inflation_data)
+inflation_data$tire_size_mm <- as.factor(inflation_data$tire_size_mm)
 
 inflation_graphic <- ggplot(inflation_data, aes(x=wheel_load_lbs, y=tire_pressure_psi, group=tire_size_mm, color=tire_size_mm)) +
   geom_line()
