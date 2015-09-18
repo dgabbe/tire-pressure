@@ -27,19 +27,18 @@ bike_tire_pressures <- function(rider_weight_lbs=100,
   total_weight <- rider_weight_lbs + bike_weight_lbs + load_lbs
   front_weight <- total_weight * front_distribution
   rear_weight <- total_weight * (1 - front_distribution)
-  front <- c(front_weight,
-              compute_tire_pressure_psi(front_weight, front_tire_size_mm) * front_tire_casing_compensation
+  front <- c(round(front_weight), front_tire_size_mm,
+              round(compute_tire_pressure_psi(front_weight, front_tire_size_mm) * front_tire_casing_compensation)
              )
-  rear <- c(rear_weight,
-            compute_tire_pressure_psi(rear_weight, rear_tire_size_mm) * rear_tire_casing_compensation
+  rear <- c(round(rear_weight), rear_tire_size_mm,
+            round(compute_tire_pressure_psi(rear_weight, rear_tire_size_mm) * rear_tire_casing_compensation)
              )
-#  pressures <- data.frame( front_row = front, rear_row = rear)
-  pressures <- matrix(front, ncol=2, byrow=TRUE)
-  #       dimnames=list(c("Front", "Rear"), c("Weight", "Pressure")))
+  pressures <- matrix(front, ncol=3, byrow=TRUE)
   pressures <- rbind(pressures, rear)
   pressures <- as.data.frame(pressures)
-  colnames(pressures) <- c("Weight", "Pressure")
+  colnames(pressures) <- c("Weight", "tire_size_mm", "Pressure")
   rownames(pressures) <- c("Front", "Rear")
+  pressures$tire_size_mm <- as.factor(pressures$tire_size_mm)
   return(pressures)
 }
 
@@ -50,7 +49,7 @@ inflation_data <- matrix(ncol=3, byrow=TRUE,
 wheel_loads_lbs <- c(66, 77, 88, 100, 110, 121, 132, 143, 154)
 
 # Nominal tire sizes
-tire_sizes_mm <- c(23, 25, 28, 32, 35, 42, 48)
+tire_sizes_mm <- c(23, 25, 28, 32, 35, 38, 42, 48)
 
 for(wll in wheel_loads_lbs){
   for(ts in tire_sizes_mm){
@@ -59,10 +58,56 @@ for(wll in wheel_loads_lbs){
 }
 
 inflation_data <- as.data.frame(inflation_data)
+inflation_data <- inflation_data[-c(1), ] # hack alert!
 inflation_data$tire_size_mm <- as.factor(inflation_data$tire_size_mm)
 
-inflation_graphic <- ggplot(inflation_data, aes(x=wheel_load_lbs, y=tire_pressure_psi, group=tire_size_mm, color=tire_size_mm)) +
-  geom_line()
+base_inflation_plot <- ggplot(inflation_data,
+                            aes(x=wheel_load_lbs, y=tire_pressure_psi,
+                                group=tire_size_mm, color=tire_size_mm
+                            )) +
+                    labs(title = "Suggested Bike Tire Inflation\nfor 26in, 650B, and 700C",
+                         x = "Wheel Load (Lbs)", y = "Tire Pressure (PSI)") +
+                    theme(panel.grid.minor.x = element_line(colour="black", linetype="dotted", size=0.25),
+                          panel.grid.minor.y = element_line(color="black", size=0.25)) +
+                    theme(panel.background = element_blank()) +
+                    theme(aspect.ratio = 0.66) + # hum, might coord_fixed work better?
+                    scale_color_brewer(type="seq", palette = "Set1") +
+                    scale_x_continuous(breaks=seq(floor(min(inflation_data$wheel_load_lbs) / 10) * 10, ceiling(max(inflation_data$wheel_load_lbs) / 10) * 10, 10)) +
+                    scale_y_continuous(breaks=seq(15, 165, 5)) +
+                    geom_line()
+# # experimenting
+# base_inflation_plot +
+#   geom_point(data = mooney,
+#              aes(x= Weight, y=Pressure, color="black", group= NULL, shape=rownames(mooney)))
+# experimenting
+base_inflation_plot +
+  geom_point(data = mooney,
+             aes(x= Weight, y=Pressure, color="black", group= NULL, shape=24))
 
+display_bike_inflation <- function(bike) {
 
-# try melt in reshape package?
+#  cat(str(bike))
+  base_inflation_plot +
+     geom_point(data = bike,
+              mapping = aes(x = Weight, y = Pressure, color = rownames(bike), shape = rownames(bike))
+       )
+}
+
+mooney <- bike_tire_pressures(rider_weight_lbs = 165,
+                              bike_weight_lbs = 20,
+                              front_distribution = 0.4,
+                              front_tire_size_mm = 26,
+                              front_tire_casing_compensation = 1.1,
+                              rear_tire_size_mm = 28,
+                              rear_tire_casing_compensation = 1.1)
+
+norco <- bike_tire_pressures(rider_weight_lbs = 165,
+                             bike_weight_lbs = 35,
+                             load_lbs = 20,
+                             front_distribution = 0.5,
+                             front_tire_size_mm = 32,
+                             front_tire_casing_compensation = 1.1,
+                             rear_tire_size_mm = 28)
+mooney1 <- mooney
+mooney1 <- mooney1[, -c(2)]
+
