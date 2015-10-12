@@ -45,12 +45,17 @@ bike_tire_pressures <- function(rider_weight_lbs=100,
 inflation_data <- matrix(ncol=3, byrow=TRUE,
                            dimnames=list(c(), c("wheel_load_lbs", "tire_size_mm", "tire_pressure_psi")))
 
-# Based on the Bicycle Quarterly chart which was laid in kilograms
+# Based on the Bicycle Quarterly chart which was laid out in kilograms
 wheel_loads_lbs <- c(66, 77, 88, 100, 110, 121, 132, 143, 154)
 
-# Nominal tire sizes
+# Nominal tire sizes. Also happen to be the ones Compass Bicycle sells
 tire_sizes_mm <- c(23, 25, 28, 32, 35, 38, 42, 48)
 
+#tire_size_labels <- lapply(tire_sizes_mm, function (t) {paste(as.character(t), "mm", sep = "")})
+
+# Figure out double nested apply semantics!
+# Even worse - first row is NAs because of inflation_data has no info in it for
+# first rbind call.
 for(wll in wheel_loads_lbs){
   for(ts in tire_sizes_mm){
     inflation_data <- rbind(inflation_data, inflation_datum(wll, ts))
@@ -60,38 +65,7 @@ for(wll in wheel_loads_lbs){
 inflation_data <- as.data.frame(inflation_data)
 inflation_data <- inflation_data[-c(1), ] # hack alert!
 inflation_data$tire_size_mm <- as.factor(inflation_data$tire_size_mm)
-
-base_inflation_plot <- ggplot(inflation_data,
-                            aes(x=wheel_load_lbs, y=tire_pressure_psi,
-                                group=tire_size_mm, color=tire_size_mm
-                            )) +
-                    labs(title = "Suggested Bike Tire Inflation\nfor 26in, 650B, and 700C",
-                         x = "Wheel Load (Lbs)", y = "Tire Pressure (PSI)") +
-                    theme(panel.grid.minor.x = element_line(colour="black", linetype="dotted", size=0.25),
-                          panel.grid.minor.y = element_line(color="black", size=0.25)) +
-                    theme(panel.background = element_blank()) +
-                    theme(aspect.ratio = 0.66) + # hum, might coord_fixed work better?
-                    scale_color_brewer(type="seq", palette = "Set1") +
-                    scale_x_continuous(breaks=seq(floor(min(inflation_data$wheel_load_lbs) / 10) * 10, ceiling(max(inflation_data$wheel_load_lbs) / 10) * 10, 10)) +
-                    scale_y_continuous(breaks=seq(15, 165, 5)) +
-                    geom_line()
-# # experimenting
-# base_inflation_plot +
-#   geom_point(data = mooney,
-#              aes(x= Weight, y=Pressure, color="black", group= NULL, shape=rownames(mooney)))
-# experimenting
-base_inflation_plot +
-  geom_point(data = mooney,
-             aes(x= Weight, y=Pressure, color="black", group= NULL, shape=24))
-
-display_bike_inflation <- function(bike) {
-
-#  cat(str(bike))
-  base_inflation_plot +
-     geom_point(data = bike,
-              mapping = aes(x = Weight, y = Pressure, color = rownames(bike), shape = rownames(bike))
-       )
-}
+inflation_data$label  <- paste(inflation_data$tire_size_mm, "mm", sep = "")
 
 mooney <- bike_tire_pressures(rider_weight_lbs = 165,
                               bike_weight_lbs = 20,
@@ -108,6 +82,61 @@ norco <- bike_tire_pressures(rider_weight_lbs = 165,
                              front_tire_size_mm = 32,
                              front_tire_casing_compensation = 1.1,
                              rear_tire_size_mm = 28)
-mooney1 <- mooney
-mooney1 <- mooney1[, -c(2)]
+mooney1 <- mooney[, -c(2)]
+
+theme_dg <- theme_bw() +
+  theme(panel.grid.minor.x = element_line(colour="black", linetype="dotted", size=0.25),
+        panel.grid.minor.y = element_line(color="black", size=0.25),
+        panel.background = element_blank()
+  )
+
+
+base_inflation_plot <- ggplot(inflation_data,
+                              aes(x=wheel_load_lbs, y=tire_pressure_psi,
+                                  group=tire_size_mm, color=tire_size_mm
+                              )) +
+                    theme_dg +
+                    labs(title = "Suggested Bike Tire Inflation\nfor 26in, 650B, and 700C",
+                         x = "Wheel Load (Lbs)", y = "Tire Pressure (PSI)") +
+#                    theme(legend.position = c(0.08, 0.735), legend.justification = c(0, 1)) +
+                    theme(aspect.ratio = 0.66) + # hum, might coord_fixed work better?
+                    scale_color_brewer(name = "Tire Size (mm)", type="seq", palette = "Set1") +
+                    scale_x_continuous(breaks=seq(floor(min(inflation_data$wheel_load_lbs) / 10) * 10,
+                                                  ceiling(max(inflation_data$wheel_load_lbs) / 10) * 10, 10)) +
+                    scale_y_continuous(breaks=seq(15, 165, 5)) +
+                    geom_line(size = 0.75, show_guide = FALSE) +
+                    expand_limits(x = 158) +
+                    geom_dl(aes(label = label), method = list("last.qp", cex = 0.75, hjust = -0.05), color = "Black", show_guide = FALSE)
+
+#base_inflation_plot <- direct.label(base_inflation_plot)
+
+mooney_inflation <- base_inflation_plot +
+  geom_point(data=mooney, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
+  annotate("text", label = paste("F: ", mooney[1,3], sep=""), x = mooney[1,1], y = mooney[1,3], vjust = -0.4, parse = TRUE) +
+  annotate("text", label = paste("R: ", mooney[2,3]), x = mooney[2,1], y = mooney[2,3], vjust = -0.4, parse = TRUE)
+
+
+
+
+# # experimenting
+# base_inflation_plot +
+#   geom_point(data = mooney,
+#              aes(x= Weight, y=Pressure, color="black", group= NULL, shape=rownames(mooney)))
+# experimenting
+base_inflation_plot +
+  geom_point(data=mooney, aes(x=Weight, y = Pressure, color = "Black"))
+
+# try setting weight and/or pressure to integers - first see how to check data type in mooney data.frame
+
+display_bike_inflation <- function(bike) {
+
+#  cat(str(bike))
+  base_inflation_plot +
+     geom_point(data = bike,
+              mapping = aes(x = Weight, y = Pressure, color = rownames(bike), shape = rownames(bike))
+       )
+}
+
+
+
 
