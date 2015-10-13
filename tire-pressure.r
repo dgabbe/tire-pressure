@@ -68,8 +68,8 @@ inflation_data$tire_size_mm <- as.factor(inflation_data$tire_size_mm)
 inflation_data$label  <- paste(inflation_data$tire_size_mm, "mm", sep = "")
 
 theme_dg <- theme_bw() +
-  theme(panel.grid.minor.x = element_line(colour="black", linetype="dotted", size=0.25),
-        panel.grid.minor.y = element_line(color="black", size=0.25),
+  theme(panel.grid.minor = element_line(colour="#666666", linetype="dotted", size=0.25),
+        panel.grid.major = element_line(size = 0.25, color = "#555555"),
         panel.background = element_blank()
   )
 
@@ -82,11 +82,12 @@ base_inflation_plot <- ggplot(inflation_data,
                     labs(title = "Suggested Bike Tire Inflation\nfor 26in, 650B, and 700C",
                          x = "Wheel Load (Lbs)", y = "Tire Pressure (PSI)") +
 #                    theme(legend.position = c(0.08, 0.735), legend.justification = c(0, 1)) +
-                    theme(aspect.ratio = 0.66) + # hum, might coord_fixed work better?
+                    theme(aspect.ratio = 0.66) +
                     scale_color_brewer(name = "Tire Size (mm)", type="seq", palette = "Set1") +
                     scale_x_continuous(breaks=seq(floor(min(inflation_data$wheel_load_lbs) / 10) * 10,
                                                   ceiling(max(inflation_data$wheel_load_lbs) / 10) * 10, 10)) +
-                    scale_y_continuous(breaks=seq(15, 165, 5)) +
+                    scale_y_continuous(breaks=seq(20, 160, 10)) +
+                    coord_cartesian(ylim = c(20, 150)) +
                     geom_line(size = 0.75, show_guide = FALSE) +
                     expand_limits(x = 158) +
                     geom_dl(aes(label = label), method = list("last.qp", cex = 0.75, hjust = -0.05),
@@ -94,82 +95,19 @@ base_inflation_plot <- ggplot(inflation_data,
 
 #base_inflation_plot <- direct.label(base_inflation_plot)
 
-# See if I can pass in a bike_tire_pressure object as well
-display_bike_inflation <- function (base_plot = base_inflation_plot,
-                                    rider_weight_lbs=100,
-                                    bike_weight_lbs=15,
-                                    load_lbs=2,
-                                    front_tire_casing_compensation=1,
-                                    front_tire_size_mm=28,
-                                    rear_tire_casing_compensation=1,
-                                    rear_tire_size_mm=28,
-                                    front_distribution=0.5) {
- bike <-  bike_tire_pressures(rider_weight_lbs = rider_weight_lbs,
-                      bike_weight_lbs = bike_weight_lbs,
-                      load_lbs = load_lbs,
-                      front_distribution,
-                      front_tire_size_mm = front_tire_size_mm,
-                      front_tire_casing_compensation = front_tire_casing_compensation,
-                      rear_tire_size_mm = rear_tire_size_mm,
-                      rear_tire_casing_compensation = rear_tire_casing_compensation)
-
- return(base_plot +
-   geom_point(data=bike, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
-   annotate("text", label = paste0("F: ", bike[1,3]), x = bike[1,1], y = bike[1,3],
-            vjust = -0.4, parse = TRUE) +
-   annotate("text", label = paste0("R: ", bike[2,3]), x = bike[2,1], y = bike[2,3],
-            vjust = -0.4, parse = TRUE)
-   )
-
+display_bike_inflation <- function (base_plot = base_inflation_plot, bike) {
+  return(base_plot +
+           geom_point(data=bike, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
+           annotate("text", label = paste0("F: ", bike[1,3]), x = bike[1,1], y = bike[1,3],
+                    vjust = -0.4, parse = TRUE) +
+           annotate("text", label = paste0("R: ", bike[2,3]), x = bike[2,1], y = bike[2,3],
+                    vjust = -0.4, parse = TRUE)
+  )
 }
 
-mooney <- bike_tire_pressures(rider_weight_lbs = 165,
-                              bike_weight_lbs = 20,
-                              front_distribution = 0.4,
-                              front_tire_size_mm = 26,
-                              front_tire_casing_compensation = 1.1,
-                              rear_tire_size_mm = 28,
-                              rear_tire_casing_compensation = 1.1)
-
-norco_shopping <- bike_tire_pressures(rider_weight_lbs = 165,
-                             bike_weight_lbs = 35,
-                             load_lbs = 20,
-                             front_distribution = 0.5,
-                             front_tire_size_mm = 32,
-                             front_tire_casing_compensation = 1.1,
-                             rear_tire_size_mm = 28)
-
-norco_shopping_35 <- bike_tire_pressures(rider_weight_lbs = 165,
-                                      bike_weight_lbs = 35,
-                                      load_lbs = 20,
-                                      front_distribution = 0.5,
-                                      front_tire_size_mm = 35,
-                                      front_tire_casing_compensation = 1.1,
-                                      rear_tire_size_mm = 32,
-                                      rear_tire_casing_compensation = 1.1)
-
-norco_fun <- bike_tire_pressures(rider_weight_lbs = 165,
-                                      bike_weight_lbs = 35,
-                                      load_lbs = 3,
-                                      front_distribution = 0.45,
-                                      front_tire_size_mm = 32,
-                                      front_tire_casing_compensation = 1.1,
-                                      rear_tire_size_mm = 28)
-
-norco_plot <- display_bike_inflation(base_inflation_plot,
-                                     rider_weight_lbs = 165,
-                                     bike_weight_lbs = 35,
-                                     load_lbs = 20,
-                                     front_distribution = 0.5,
-                                     front_tire_size_mm = 32,
-                                     front_tire_casing_compensation = 1.1,
-                                     rear_tire_size_mm = 28)
-
-
-
-mooney_inflation <- base_inflation_plot +
-  geom_point(data=mooney, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
-  annotate("text", label = paste0("F: ", mooney[1,3]), x = mooney[1,1], y = mooney[1,3],
-           vjust = -0.4, parse = TRUE) +
-  annotate("text", label = paste0("R: ", mooney[2,3]), x = mooney[2,1], y = mooney[2,3],
-           vjust = -0.4, parse = TRUE)
+# mooney_inflation <- base_inflation_plot +
+#   geom_point(data=mooney, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
+#   annotate("text", label = paste0("F: ", mooney[1,3]), x = mooney[1,1], y = mooney[1,3],
+#            vjust = -0.4, parse = TRUE) +
+#   annotate("text", label = paste0("R: ", mooney[2,3]), x = mooney[2,1], y = mooney[2,3],
+#            vjust = -0.4, parse = TRUE)
