@@ -76,6 +76,13 @@ theme_dg <- theme_bw() +
         panel.background = element_blank()
   )
 
+dual_weight <- function(lbs) {
+  return(sprintf('%.0f lbs\n%.0f kg', lbs, lbs * 0.45359))
+}
+
+dual_pressure <- function(psi) {
+  return(sprintf('%3d psi\n%.1f bar', psi, psi * 0.068947))
+}
 
 base_inflation_plot <- ggplot(inflation_data,
                               aes(x=wheel_load_lbs, y=tire_pressure_psi,
@@ -83,13 +90,14 @@ base_inflation_plot <- ggplot(inflation_data,
                               )) +
                     theme_dg +
                     labs(title = "Suggested Bike Tire Inflation\nfor 26in, 650B, and 700C Tires",
-                         x = "Wheel Load (Lbs)", y = "Tire Pressure (PSI)") +
+                         x = "Wheel Load", y = "Tire Pressure") +
 #                    theme(legend.position = c(0.08, 0.735), legend.justification = c(0, 1)) +
                     theme(aspect.ratio = 0.66) +
                     scale_color_brewer(name = "Tire Size (mm)", type="seq", palette = "Set1") +
                     scale_x_continuous(breaks=seq(floor(min(inflation_data$wheel_load_lbs) / 10) * 10,
-                                                  ceiling(max(inflation_data$wheel_load_lbs) / 10) * 10, 10)) +
-                    scale_y_continuous(breaks=seq(20, 160, 10)) +
+                                                  ceiling(max(inflation_data$wheel_load_lbs) / 10) * 10, 10),
+                                       label = dual_weight) +
+                    scale_y_continuous(breaks=seq(20, 160, 10), label = dual_pressure) +
                     coord_cartesian(ylim = c(20, 150)) +
                     annotate("rect", xmin = 66, xmax= 130, ymin = 20, ymax = 105, alpha = 0.1, fill = "#33cc33") +
                     annotate("text", label = paste0("General sport riding comfort & safety"),
