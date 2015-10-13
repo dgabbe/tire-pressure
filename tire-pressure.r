@@ -84,6 +84,10 @@ dual_pressure <- function(psi) {
   return(sprintf('%3d psi\n%.1f bar', psi, psi * 0.068947))
 }
 
+dual_pressure_point <- function(psi) {
+  return(sprintf('%3d psi\n%.1f bar', psi, psi * 0.068947))
+}
+
 base_inflation_plot <- ggplot(inflation_data,
                               aes(x=wheel_load_lbs, y=tire_pressure_psi,
                                   group=tire_size_mm, color=tire_size_mm
@@ -112,16 +116,11 @@ base_inflation_plot <- ggplot(inflation_data,
 display_bike_inflation <- function (base_plot = base_inflation_plot, bike) {
   return(base_plot +
            geom_point(data=bike, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
-           annotate("text", label = paste0("F: ", bike[1,3]), x = bike[1,1], y = bike[1,3],
-                    vjust = -0.4, parse = TRUE) +
-           annotate("text", label = paste0("R: ", bike[2,3]), x = bike[2,1], y = bike[2,3],
-                    vjust = -0.4, parse = TRUE)
+           annotate("text", label = paste0("F: ", dual_pressure(bike[1,3])),
+                                           x = bike[1,1], y = bike[1,3],
+                    vjust = -0.4) +
+            annotate("text", label = paste0("R: ", dual_pressure_point(bike[2,3])),
+                                            x = bike[2,1], y = bike[2,3],
+                     vjust = -0.4)
   )
 }
-
-# mooney_inflation <- base_inflation_plot +
-#   geom_point(data=mooney, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
-#   annotate("text", label = paste0("F: ", mooney[1,3]), x = mooney[1,1], y = mooney[1,3],
-#            vjust = -0.4, parse = TRUE) +
-#   annotate("text", label = paste0("R: ", mooney[2,3]), x = mooney[2,1], y = mooney[2,3],
-#            vjust = -0.4, parse = TRUE)
