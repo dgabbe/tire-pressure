@@ -5,6 +5,9 @@
 # Weight_lbs is the load on the bicycle wheel and typcially 40 - 60 percent
 # of the total weight of the rider, bike and carried items.
 #
+# 1 Psi = 0.0689475729 Bar
+# 1 pound = 0.45359 kilogram
+#
 compute_tire_pressure_psi <- function(weight_lbs, tireSize_mm) {
   return(153.6 * weight_lbs / tireSize_mm**1.5785 - 7.1685)
 }
@@ -79,7 +82,7 @@ base_inflation_plot <- ggplot(inflation_data,
                                   group=tire_size_mm, color=tire_size_mm
                               )) +
                     theme_dg +
-                    labs(title = "Suggested Bike Tire Inflation\nfor 26in, 650B, and 700C",
+                    labs(title = "Suggested Bike Tire Inflation\nfor 26in, 650B, and 700C Tires",
                          x = "Wheel Load (Lbs)", y = "Tire Pressure (PSI)") +
 #                    theme(legend.position = c(0.08, 0.735), legend.justification = c(0, 1)) +
                     theme(aspect.ratio = 0.66) +
@@ -88,6 +91,9 @@ base_inflation_plot <- ggplot(inflation_data,
                                                   ceiling(max(inflation_data$wheel_load_lbs) / 10) * 10, 10)) +
                     scale_y_continuous(breaks=seq(20, 160, 10)) +
                     coord_cartesian(ylim = c(20, 150)) +
+                    annotate("rect", xmin = 66, xmax= 130, ymin = 20, ymax = 105, alpha = 0.1, fill = "#33cc33") +
+                    annotate("text", label = paste0("General sport riding comfort & safety"),
+                             x = 67, y = 99, hjust = 0, vjust = -0.4, color = "#33cc33") +
                     geom_line(size = 0.75, show_guide = FALSE) +
                     expand_limits(x = 158) +
                     geom_dl(aes(label = label), method = list("last.qp", cex = 0.75, hjust = -0.05),
