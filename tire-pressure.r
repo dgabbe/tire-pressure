@@ -67,23 +67,6 @@ inflation_data <- inflation_data[-c(1), ] # hack alert!
 inflation_data$tire_size_mm <- as.factor(inflation_data$tire_size_mm)
 inflation_data$label  <- paste(inflation_data$tire_size_mm, "mm", sep = "")
 
-mooney <- bike_tire_pressures(rider_weight_lbs = 165,
-                              bike_weight_lbs = 20,
-                              front_distribution = 0.4,
-                              front_tire_size_mm = 26,
-                              front_tire_casing_compensation = 1.1,
-                              rear_tire_size_mm = 28,
-                              rear_tire_casing_compensation = 1.1)
-
-norco <- bike_tire_pressures(rider_weight_lbs = 165,
-                             bike_weight_lbs = 35,
-                             load_lbs = 20,
-                             front_distribution = 0.5,
-                             front_tire_size_mm = 32,
-                             front_tire_casing_compensation = 1.1,
-                             rear_tire_size_mm = 28)
-mooney1 <- mooney[, -c(2)]
-
 theme_dg <- theme_bw() +
   theme(panel.grid.minor.x = element_line(colour="black", linetype="dotted", size=0.25),
         panel.grid.minor.y = element_line(color="black", size=0.25),
@@ -106,37 +89,87 @@ base_inflation_plot <- ggplot(inflation_data,
                     scale_y_continuous(breaks=seq(15, 165, 5)) +
                     geom_line(size = 0.75, show_guide = FALSE) +
                     expand_limits(x = 158) +
-                    geom_dl(aes(label = label), method = list("last.qp", cex = 0.75, hjust = -0.05), color = "Black", show_guide = FALSE)
+                    geom_dl(aes(label = label), method = list("last.qp", cex = 0.75, hjust = -0.05),
+                            color = "Black", show_guide = FALSE)
 
 #base_inflation_plot <- direct.label(base_inflation_plot)
 
-mooney_inflation <- base_inflation_plot +
-  geom_point(data=mooney, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
-  annotate("text", label = paste("F: ", mooney[1,3], sep=""), x = mooney[1,1], y = mooney[1,3], vjust = -0.4, parse = TRUE) +
-  annotate("text", label = paste("R: ", mooney[2,3]), x = mooney[2,1], y = mooney[2,3], vjust = -0.4, parse = TRUE)
+# See if I can pass in a bike_tire_pressure object as well
+display_bike_inflation <- function (base_plot = base_inflation_plot,
+                                    rider_weight_lbs=100,
+                                    bike_weight_lbs=15,
+                                    load_lbs=2,
+                                    front_tire_casing_compensation=1,
+                                    front_tire_size_mm=28,
+                                    rear_tire_casing_compensation=1,
+                                    rear_tire_size_mm=28,
+                                    front_distribution=0.5) {
+ bike <-  bike_tire_pressures(rider_weight_lbs = rider_weight_lbs,
+                      bike_weight_lbs = bike_weight_lbs,
+                      load_lbs = load_lbs,
+                      front_distribution,
+                      front_tire_size_mm = front_tire_size_mm,
+                      front_tire_casing_compensation = front_tire_casing_compensation,
+                      rear_tire_size_mm = rear_tire_size_mm,
+                      rear_tire_casing_compensation = rear_tire_casing_compensation)
 
+ return(base_plot +
+   geom_point(data=bike, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
+   annotate("text", label = paste0("F: ", bike[1,3]), x = bike[1,1], y = bike[1,3],
+            vjust = -0.4, parse = TRUE) +
+   annotate("text", label = paste0("R: ", bike[2,3]), x = bike[2,1], y = bike[2,3],
+            vjust = -0.4, parse = TRUE)
+   )
 
-
-
-# # experimenting
-# base_inflation_plot +
-#   geom_point(data = mooney,
-#              aes(x= Weight, y=Pressure, color="black", group= NULL, shape=rownames(mooney)))
-# experimenting
-base_inflation_plot +
-  geom_point(data=mooney, aes(x=Weight, y = Pressure, color = "Black"))
-
-# try setting weight and/or pressure to integers - first see how to check data type in mooney data.frame
-
-display_bike_inflation <- function(bike) {
-
-#  cat(str(bike))
-  base_inflation_plot +
-     geom_point(data = bike,
-              mapping = aes(x = Weight, y = Pressure, color = rownames(bike), shape = rownames(bike))
-       )
 }
 
+mooney <- bike_tire_pressures(rider_weight_lbs = 165,
+                              bike_weight_lbs = 20,
+                              front_distribution = 0.4,
+                              front_tire_size_mm = 26,
+                              front_tire_casing_compensation = 1.1,
+                              rear_tire_size_mm = 28,
+                              rear_tire_casing_compensation = 1.1)
+
+norco_shopping <- bike_tire_pressures(rider_weight_lbs = 165,
+                             bike_weight_lbs = 35,
+                             load_lbs = 20,
+                             front_distribution = 0.5,
+                             front_tire_size_mm = 32,
+                             front_tire_casing_compensation = 1.1,
+                             rear_tire_size_mm = 28)
+
+norco_shopping_35 <- bike_tire_pressures(rider_weight_lbs = 165,
+                                      bike_weight_lbs = 35,
+                                      load_lbs = 20,
+                                      front_distribution = 0.5,
+                                      front_tire_size_mm = 35,
+                                      front_tire_casing_compensation = 1.1,
+                                      rear_tire_size_mm = 32,
+                                      rear_tire_casing_compensation = 1.1)
+
+norco_fun <- bike_tire_pressures(rider_weight_lbs = 165,
+                                      bike_weight_lbs = 35,
+                                      load_lbs = 3,
+                                      front_distribution = 0.45,
+                                      front_tire_size_mm = 32,
+                                      front_tire_casing_compensation = 1.1,
+                                      rear_tire_size_mm = 28)
+
+norco_plot <- display_bike_inflation(base_inflation_plot,
+                                     rider_weight_lbs = 165,
+                                     bike_weight_lbs = 35,
+                                     load_lbs = 20,
+                                     front_distribution = 0.5,
+                                     front_tire_size_mm = 32,
+                                     front_tire_casing_compensation = 1.1,
+                                     rear_tire_size_mm = 28)
 
 
 
+mooney_inflation <- base_inflation_plot +
+  geom_point(data=mooney, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
+  annotate("text", label = paste0("F: ", mooney[1,3]), x = mooney[1,1], y = mooney[1,3],
+           vjust = -0.4, parse = TRUE) +
+  annotate("text", label = paste0("R: ", mooney[2,3]), x = mooney[2,1], y = mooney[2,3],
+           vjust = -0.4, parse = TRUE)
