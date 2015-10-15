@@ -9,4 +9,11 @@
 vignettes/*.html
 vignettes/*.pdf
 .Rproj.user
+<<<<<<< .merge_file_wXLyIw
 tire-pressure.Rproj
+=======
+Rplot.png
+test.pdf
+leslie-lexa.pdf
+"testing - delete.Rd"
+>>>>>>> .merge_file_MmgLcU
