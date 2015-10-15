@@ -1,3 +1,5 @@
+source("tire-pressure.r")
+
 mooney_bike <- bike_tire_pressures(rider_weight_lbs = 165,
                                    bike_weight_lbs = 20,
                                    front_distribution = 0.4,
