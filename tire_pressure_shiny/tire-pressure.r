@@ -73,19 +73,23 @@ inflation_data$label  <- paste(inflation_data$tire_size_mm, "mm", sep = "")
 theme_dg <- theme_bw() +
   theme(panel.grid.minor = element_line(colour="#666666", linetype="dotted", size=0.25),
         panel.grid.major = element_line(size = 0.25, color = "#555555"),
-        panel.background = element_blank()
+        panel.background = element_blank(),
+        plot.title = element_text(size = rel(1.75), face = "bold", vjust = 1),
+        axis.text = element_text(size = rel(1.25)),
+        axis.title.x = element_text(size = rel(1.5), vjust = -1),
+        axis.title.y = element_text(size = rel(1.5), vjust = 0)
   )
 
 dual_weight <- function(lbs) {
   return(sprintf('%.0f lbs\n%.0f kg', lbs, lbs * 0.45359))
 }
 
-dual_pressure <- function(psi) {
-  return(sprintf('%3d psi\n%.1f bar', psi, psi * 0.068947))
+dual_pressure_point <- function(position, psi) {
+  return(sprintf('%s\n%d psi\n%.1f bar', position, psi, psi * 0.068947))
 }
 
-dual_pressure_point <- function(psi) {
-  return(sprintf('%3d psi\n%.1f bar', psi, psi * 0.068947))
+dual_pressure <- function(psi) {
+  return(sprintf('%d psi\n%.1f bar', psi, psi * 0.068947))
 }
 
 base_inflation_plot <- ggplot(inflation_data,
@@ -93,7 +97,7 @@ base_inflation_plot <- ggplot(inflation_data,
                                   group=tire_size_mm, color=tire_size_mm
                               )) +
                     theme_dg +
-                    labs(title = "Suggested Bike Tire Inflation\nfor 26in, 650B, and 700C Tires",
+                    labs(title = "Optimized Bicycle Tire Pressure for 26, 650B, and 700C Sizes",
                          x = "Wheel Load", y = "Tire Pressure") +
 #                    theme(legend.position = c(0.08, 0.735), legend.justification = c(0, 1)) +
                     theme(aspect.ratio = 0.66) +
@@ -103,9 +107,9 @@ base_inflation_plot <- ggplot(inflation_data,
                                        label = dual_weight) +
                     scale_y_continuous(breaks=seq(20, 160, 10), label = dual_pressure) +
                     coord_cartesian(ylim = c(20, 150)) +
-                    annotate("rect", xmin = 66, xmax= 130, ymin = 20, ymax = 105, alpha = 0.1, fill = "#33cc33") +
-                    annotate("text", label = paste0("General sport riding comfort & safety"),
-                             x = 67, y = 99, hjust = 0, vjust = -0.4, color = "#33cc33") +
+                    annotate("rect", xmin = 66, xmax= 160, ymin = 20, ymax = 105, alpha = 0.1, fill = "#33cc33") +
+                    annotate("text", label = paste0("Attempt to keep pressure below 105 psi for safety and comfort"),
+                             x = 67, y = 99, hjust = 0, vjust = -0.9, color = "#33cc33") +
                     geom_line(size = 0.75, show_guide = FALSE) +
                     expand_limits(x = 158) +
                     geom_dl(aes(label = label), method = list("last.qp", cex = 0.75, hjust = -0.05),
@@ -116,10 +120,10 @@ base_inflation_plot <- ggplot(inflation_data,
 display_bike_inflation <- function (base_plot = base_inflation_plot, bike) {
   return(base_plot +
            geom_point(data=bike, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
-           annotate("text", label = paste0("F: ", dual_pressure(bike[1,3])),
+           annotate("text", label = dual_pressure_point("Front", bike[1,3]),
                                            x = bike[1,1], y = bike[1,3],
                     vjust = -0.4) +
-            annotate("text", label = paste0("R: ", dual_pressure_point(bike[2,3])),
+            annotate("text", label = dual_pressure_point("Rear", bike[2,3]),
                                             x = bike[2,1], y = bike[2,3],
                      vjust = -0.4)
   )
