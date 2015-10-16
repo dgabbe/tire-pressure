@@ -112,7 +112,7 @@ base_inflation_plot <- ggplot(inflation_data,
                              x = 67, y = 99, hjust = 0, vjust = -0.9, color = "#33cc33") +
                     geom_line(size = 0.75, show_guide = FALSE) +
                     expand_limits(x = 158) +
-                    geom_dl(aes(label = label), method = list("last.qp", cex = 0.75, hjust = -0.05),
+                    geom_dl(aes(label = label), method = list("last.qp", cex = 1, hjust = -0.05),
                             color = "Black", show_guide = FALSE)
 
 #base_inflation_plot <- direct.label(base_inflation_plot)
@@ -120,11 +120,12 @@ base_inflation_plot <- ggplot(inflation_data,
 display_bike_inflation <- function (base_plot = base_inflation_plot, bike) {
   return(base_plot +
            geom_point(data=bike, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
-           annotate("text", label = dual_pressure_point("Front", bike[1,3]),
-                                           x = bike[1,1], y = bike[1,3],
+           annotate("text", label = dual_pressure_point("Front", bike["Front","Pressure"]),
+                                           x = bike["Front", "Weight"], y = bike["Front","Pressure"],
                     vjust = -0.4) +
-            annotate("text", label = dual_pressure_point("Rear", bike[2,3]),
-                                            x = bike[2,1], y = bike[2,3],
+            annotate("text", label = dual_pressure_point("Rear", bike["Rear", "Pressure"]),
+                                            x = bike["Rear", "Weight"], y = bike["Rear", "Pressure"],
                      vjust = -0.4)
   )
 }
+
