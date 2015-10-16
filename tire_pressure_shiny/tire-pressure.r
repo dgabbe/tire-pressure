@@ -8,6 +8,11 @@
 # 1 Psi = 0.0689475729 Bar
 # 1 pound = 0.45359 kilogram
 #
+
+psi_to_bar <- function(psi) {return(psi * 0.068947)}
+
+lb_to_kg <- function(lb) {return(lb *  0.45359)}
+
 compute_tire_pressure_psi <- function(weight_lbs, tireSize_mm) {
   return(153.6 * weight_lbs / tireSize_mm**1.5785 - 7.1685)
 }
@@ -81,15 +86,15 @@ theme_dg <- theme_bw() +
   )
 
 dual_weight <- function(lbs) {
-  return(sprintf('%.0f lbs\n%.0f kg', lbs, lbs * 0.45359))
+  return(sprintf('%.0f lbs\n%.0f kg', lbs, lb_to_kg(lbs)))
 }
 
 dual_pressure_point <- function(position, psi) {
-  return(sprintf('%s\n%d psi\n%.1f bar', position, psi, psi * 0.068947))
+  return(sprintf('%s\n%d psi\n%.1f bar', position, psi, psi_to_bar(psi)))
 }
 
 dual_pressure <- function(psi) {
-  return(sprintf('%d psi\n%.1f bar', psi, psi * 0.068947))
+  return(sprintf('%d psi\n%.1f bar', psi, psi_to_bar(psi)))
 }
 
 base_inflation_plot <- ggplot(inflation_data,
