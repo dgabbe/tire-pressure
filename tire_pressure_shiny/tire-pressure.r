@@ -75,16 +75,6 @@ inflation_data <- inflation_data[-c(1), ] # hack alert!
 inflation_data$tire_size_mm <- as.factor(inflation_data$tire_size_mm)
 inflation_data$label  <- paste(inflation_data$tire_size_mm, "mm", sep = "")
 
-theme_dg <- theme_bw() +
-  theme(panel.grid.minor = element_line(colour="#666666", linetype="dotted", size=0.25),
-        panel.grid.major = element_line(size = 0.25, color = "#555555"),
-        panel.background = element_blank(),
-        plot.title = element_text(size = rel(1.75), face = "bold", vjust = 1),
-        axis.text = element_text(size = rel(1.25)),
-        axis.title.x = element_text(size = rel(1.5), vjust = -1),
-        axis.title.y = element_text(size = rel(1.5), vjust = 0)
-  )
-
 dual_weight <- function(lbs) {
   return(sprintf('%.0f lbs\n%.0f kg', lbs, lb_to_kg(lbs)))
 }
@@ -119,8 +109,6 @@ base_inflation_plot <- ggplot(inflation_data,
                     expand_limits(x = 158) +
                     geom_dl(aes(label = label), method = list("last.qp", cex = 1, hjust = -0.05),
                             color = "Black", show_guide = FALSE)
-
-#base_inflation_plot <- direct.label(base_inflation_plot)
 
 display_bike_inflation <- function (base_plot = base_inflation_plot, bike) {
   return(base_plot +

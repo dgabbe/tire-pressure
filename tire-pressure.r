@@ -1,6 +1,14 @@
+# This code is released under the MIT Software License.  Please refer to the
+# license file included in this project for details.
+#
+# Credit to Jan Heine and Frank Berto for their research and writing on bike
+# tire pressure.
+#
+# References:
+# http://www.bikequarterly.com/images/BQTireDrop.pdf
+#
 # The formula is imperial centric and can be found here:
 # http://www.biketinker.com/2010/bike-resources/optimal-tire-pressure-for-bicycles/
-# The original article is http://www.bikequarterly.com/images/BQTireDrop.pdf.
 #
 # Weight_lbs is the load on the bicycle wheel and typcially 40 - 60 percent
 # of the total weight of the rider, bike and carried items.
@@ -12,6 +20,10 @@
 psi_to_bar <- function(psi) {return(psi * 0.068947)}
 
 lb_to_kg <- function(lb) {return(lb *  0.45359)}
+
+credit_notice <- function() {
+  return('Credit to Jan Heine and Frank Berto for "Optimizing Your Tire Pressure for Your Weight"')
+}
 
 compute_tire_pressure_psi <- function(weight_lbs, tireSize_mm) {
   return(153.6 * weight_lbs / tireSize_mm**1.5785 - 7.1685)
@@ -89,9 +101,9 @@ dual_weight <- function(lbs) {
   return(sprintf('%.0f lbs\n%.0f kg', lbs, lb_to_kg(lbs)))
 }
 
-dual_pressure_point <- function(position, psi) {
-  return(sprintf('%s\n%d psi\n%.1f bar', position, psi, psi_to_bar(psi)))
-}
+# dual_pressure_point <- function(position, psi) {
+#   return(sprintf('%s\n%d psi\n%.1f bar', position, psi, psi_to_bar(psi)))
+# }
 
 dual_pressure <- function(psi) {
   return(sprintf('%d psi\n%.1f bar', psi, psi_to_bar(psi)))
@@ -118,9 +130,9 @@ base_inflation_plot <- ggplot(inflation_data,
                     geom_line(size = 0.75, show_guide = FALSE) +
                     expand_limits(x = 158) +
                     geom_dl(aes(label = label), method = list("last.qp", cex = 1, hjust = -0.05),
-                            color = "Black", show_guide = FALSE)
+                            color = "Black", show_guide = FALSE) +
+                    annotate("text", label = credit_notice(), size = 3, x = 90, y = 23)
 
-#base_inflation_plot <- direct.label(base_inflation_plot)
 
 display_bike_inflation <- function (base_plot = base_inflation_plot, bike) {
   return(base_plot +
