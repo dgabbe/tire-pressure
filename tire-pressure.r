@@ -30,11 +30,14 @@ compute_tire_pressure_psi <- function(weight_lbs, tireSize_mm) {
 }
 
 inflation_datum <- function(wheel_load_lbs, tire_size_mm) {
-  ltp <- c(wheel_load_lbs, tire_size_mm, compute_tire_pressure_psi(wheel_load_lbs, tire_size_mm))
+  ltp <- c(wheel_load_lbs,
+           tire_size_mm,
+           compute_tire_pressure_psi(wheel_load_lbs, tire_size_mm))
   return(ltp)
 }
 
 # Extra light casings need an extra 10% pressure to prevent the casing threads from breaking.
+# Increased to 15% to account for guage variations.
 #
 bike_tire_pressures <- function(rider_weight_lbs=100,
                                 bike_weight_lbs=15,
@@ -127,21 +130,20 @@ base_inflation_plot <- ggplot(inflation_data,
                     annotate("rect", xmin = 66, xmax= 160, ymin = 20, ymax = 105, alpha = 0.1, fill = "#33cc33") +
                     annotate("text", label = paste0("Attempt to keep pressure below 105 psi for safety and comfort"),
                              x = 67, y = 99, hjust = 0, vjust = -0.9, color = "#33cc33") +
-                    geom_line(size = 0.75, show_guide = FALSE) +
+                    geom_line(size = 0.75, show.legend = FALSE) +
                     expand_limits(x = 158) +
                     geom_dl(aes(label = label), method = list("last.qp", cex = 1, hjust = -0.05),
-                            color = "Black", show_guide = FALSE) +
+                            color = "Black", show_guides = FALSE) +
                     annotate("text", label = credit_notice(), size = 3, x = 90, y = 23)
 
 
 display_bike_inflation <- function (base_plot = base_inflation_plot, bike) {
   return(base_plot +
-           geom_point(data=bike, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
-           annotate("text", label = dual_pressure_point("Front", bike["Front","Pressure"]),
-                                           x = bike["Front", "Weight"], y = bike["Front","Pressure"],
-                    vjust = -0.4) +
-            annotate("text", label = dual_pressure_point("Rear", bike["Rear", "Pressure"]),
-                                            x = bike["Rear", "Weight"], y = bike["Rear", "Pressure"],
-                     vjust = -0.4)
+          geom_point(data=bike, aes(x=Weight, y = Pressure),
+                     color = "Black", show.legend = FALSE) +
+          annotate("text", label = dual_pressure_point("Front", bike["Front","Pressure"]),
+                    x = bike["Front", "Weight"], y = bike["Front","Pressure"], vjust = -0.4) +
+          annotate("text", label = dual_pressure_point("Rear", bike["Rear", "Pressure"]),
+                      x = bike["Rear", "Weight"], y = bike["Rear", "Pressure"], vjust = -0.4)
   )
 }
