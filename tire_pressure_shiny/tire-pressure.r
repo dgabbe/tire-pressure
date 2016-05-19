@@ -1,3 +1,7 @@
+library("dgutil")
+library("ggplot2")
+library("directlabels")
+
 # The formula is imperial centric and can be found here:
 # http://www.biketinker.com/2010/bike-resources/optimal-tire-pressure-for-bicycles/
 # The original article is http://www.bikequarterly.com/images/BQTireDrop.pdf.
