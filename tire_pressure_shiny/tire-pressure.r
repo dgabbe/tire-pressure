@@ -1,6 +1,6 @@
-library("dgutil")
-library("ggplot2")
-library("directlabels")
+library("dgutils")
+library("ggplot2") # version 2.2.1
+library("directlabels") # version 2015.12.16
 
 # The formula is imperial centric and can be found here:
 # http://www.biketinker.com/2010/bike-resources/optimal-tire-pressure-for-bicycles/
@@ -28,23 +28,28 @@ inflation_datum <- function(wheel_load_lbs, tire_size_mm) {
 
 # Extra light casings need an extra 10% pressure to prevent the casing threads from breaking.
 #
-bike_tire_pressures <- function(rider_weight_lbs=100,
-                                bike_weight_lbs=15,
-                                load_lbs=2,
-                                front_tire_casing_compensation=1,
-                                front_tire_size_mm=28,
-                                rear_tire_casing_compensation=1,
-                                rear_tire_size_mm=28,
-                                front_distribution=0.5){
+bike_tire_pressures <- function(
+  rider_weight_lbs=100,
+  bike_weight_lbs=15,
+  load_lbs=2,
+  front_tire_casing_compensation=1,
+  front_tire_size_mm=28,
+  rear_tire_casing_compensation=1,
+  rear_tire_size_mm=28,
+  front_distribution=0.5
+){
   total_weight <- rider_weight_lbs + bike_weight_lbs + load_lbs
   front_weight <- total_weight * front_distribution
   rear_weight <- total_weight * (1 - front_distribution)
-  front <- c(round(front_weight), front_tire_size_mm,
-              round(compute_tire_pressure_psi(front_weight, front_tire_size_mm) * front_tire_casing_compensation)
-             )
-  rear <- c(round(rear_weight), rear_tire_size_mm,
-            round(compute_tire_pressure_psi(rear_weight, rear_tire_size_mm) * rear_tire_casing_compensation)
-             )
+  front <- c(
+    round(front_weight), front_tire_size_mm,
+    round(compute_tire_pressure_psi(front_weight, front_tire_size_mm) * front_tire_casing_compensation)
+  )
+  rear <- c(
+    round(rear_weight),
+    rear_tire_size_mm,
+    round(compute_tire_pressure_psi(rear_weight, rear_tire_size_mm) * rear_tire_casing_compensation)
+  )
   pressures <- matrix(front, ncol=3, byrow=TRUE)
   pressures <- rbind(pressures, rear)
   pressures <- as.data.frame(pressures)
@@ -54,8 +59,11 @@ bike_tire_pressures <- function(rider_weight_lbs=100,
   return(pressures)
 }
 
-inflation_data <- matrix(ncol=3, byrow=TRUE,
-                           dimnames=list(c(), c("wheel_load_lbs", "tire_size_mm", "tire_pressure_psi")))
+inflation_data <- matrix(
+  ncol=3,
+  byrow=TRUE,
+  dimnames=list(c(), c("wheel_load_lbs", "tire_size_mm", "tire_pressure_psi"))
+  )
 
 # Based on the Bicycle Quarterly chart which was laid out in kilograms
 wheel_loads_lbs <- c(66, 77, 88, 100, 110, 121, 132, 143, 154)
@@ -98,7 +106,6 @@ base_inflation_plot <- ggplot(inflation_data,
                     theme_dg +
                     labs(title = "Optimized Bicycle Tire Pressure for 26, 650B, and 700C Sizes",
                          x = "Wheel Load", y = "Tire Pressure") +
-#                    theme(legend.position = c(0.08, 0.735), legend.justification = c(0, 1)) +
                     theme(aspect.ratio = 0.66) +
                     scale_color_brewer(name = "Tire Size (mm)", type="seq", palette = "Set1") +
                     scale_x_continuous(breaks=seq(floor(min(inflation_data$wheel_load_lbs) / 10) * 10,
@@ -109,20 +116,26 @@ base_inflation_plot <- ggplot(inflation_data,
                     annotate("rect", xmin = 66, xmax= 160, ymin = 20, ymax = 105, alpha = 0.1, fill = "#33cc33") +
                     annotate("text", label = paste0("Attempt to keep pressure below 105 psi for safety and comfort"),
                              x = 67, y = 99, hjust = 0, vjust = -0.9, color = "#33cc33") +
-                    geom_line(size = 0.75, show_guide = FALSE) +
+                    geom_line(size = 0.75, show.legend = FALSE) +
                     expand_limits(x = 158) +
                     geom_dl(aes(label = label), method = list("last.qp", cex = 1, hjust = -0.05),
-                            color = "Black", show_guide = FALSE)
+                            color = "Black")
 
 display_bike_inflation <- function (base_plot = base_inflation_plot, bike) {
-  return(base_plot +
-           geom_point(data=bike, aes(x=Weight, y = Pressure), color = "Black", show_guide = FALSE) +
-           annotate("text", label = dual_pressure_point("Front", bike["Front","Pressure"]),
-                                           x = bike["Front", "Weight"], y = bike["Front","Pressure"],
-                    vjust = -0.4) +
-            annotate("text", label = dual_pressure_point("Rear", bike["Rear", "Pressure"]),
-                                            x = bike["Rear", "Weight"], y = bike["Rear", "Pressure"],
-                     vjust = -0.4)
+  return(
+    base_plot +
+    geom_point(data=bike, aes(x=Weight, y = Pressure), color = "Black", show.legend = FALSE) +
+    annotate(
+      "text",
+      label = dual_pressure_point("Front", bike["Front","Pressure"]),
+      x = bike["Front", "Weight"], y = bike["Front","Pressure"],
+      vjust = -0.4
+    ) +
+    annotate(
+      "text", label = dual_pressure_point("Rear", bike["Rear", "Pressure"]),
+      x = bike["Rear", "Weight"], y = bike["Rear", "Pressure"],
+      vjust = -0.4
+    )
   )
 }
 

@@ -104,9 +104,9 @@ dual_weight <- function(lbs) {
   return(sprintf('%.0f lbs\n%.0f kg', lbs, lb_to_kg(lbs)))
 }
 
-# dual_pressure_point <- function(position, psi) {
-#   return(sprintf('%s\n%d psi\n%.1f bar', position, psi, psi_to_bar(psi)))
-# }
+dual_pressure_point <- function(position, psi) {
+  return(sprintf('%s\n%d psi\n%.1f bar', position, psi, psi_to_bar(psi)))
+}
 
 dual_pressure <- function(psi) {
   return(sprintf('%d psi\n%.1f bar', psi, psi_to_bar(psi)))
@@ -133,7 +133,7 @@ base_inflation_plot <- ggplot(inflation_data,
                     geom_line(size = 0.75, show.legend = FALSE) +
                     expand_limits(x = 158) +
                     geom_dl(aes(label = label), method = list("last.qp", cex = 1, hjust = -0.05),
-                            color = "Black", show_guides = FALSE) +
+                            color = "Black") +
                     annotate("text", label = credit_notice(), size = 3, x = 90, y = 23)
 
 
