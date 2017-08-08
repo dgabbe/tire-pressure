@@ -94,10 +94,12 @@ theme_dg <- theme_bw() +
   theme(panel.grid.minor = element_line(colour="#666666", linetype="dotted", size=0.25),
         panel.grid.major = element_line(size = 0.25, color = "#555555"),
         panel.background = element_blank(),
-        plot.title = element_text(size = rel(1.75), face = "bold", vjust = 1),
-        axis.text = element_text(size = rel(1.25)),
-        axis.title.x = element_text(size = rel(1.5), vjust = -1),
-        axis.title.y = element_text(size = rel(1.5), vjust = 0)
+        plot.title = element_text(face = "bold", vjust = 1)
+# RStudio scaling bug fixed - don't need lines below!
+#        plot.title = element_text(size = rel(1.75), face = "bold", vjust = 1),
+#        axis.text = element_text(size = rel(1.25)),
+#        axis.title.x = element_text(size = rel(1.5), vjust = -1),
+#        axis.title.y = element_text(size = rel(1.5), vjust = 0)
   )
 
 dual_weight <- function(lbs) {
@@ -112,29 +114,49 @@ dual_pressure <- function(psi) {
   return(sprintf('%d psi\n%.1f bar', psi, psi_to_bar(psi)))
 }
 
-base_inflation_plot <- ggplot(inflation_data,
-                              aes(x=wheel_load_lbs, y=tire_pressure_psi,
-                                  group=tire_size_mm, color=tire_size_mm
-                              )) +
-                    theme_dg +
-                    labs(title = "Optimized Bicycle Tire Pressure for 26, 650B, and 700C Sizes",
-                         x = "Wheel Load", y = "Tire Pressure") +
-#                    theme(legend.position = c(0.08, 0.735), legend.justification = c(0, 1)) +
-                    theme(aspect.ratio = 0.66) +
-                    scale_color_brewer(name = "Tire Size (mm)", type="seq", palette = "Set1") +
-                    scale_x_continuous(breaks=seq(floor(min(inflation_data$wheel_load_lbs) / 10) * 10,
-                                                  ceiling(max(inflation_data$wheel_load_lbs) / 10) * 10, 10),
-                                       label = dual_weight) +
-                    scale_y_continuous(breaks=seq(20, 160, 10), label = dual_pressure) +
-                    coord_cartesian(ylim = c(20, 150)) +
-                    annotate("rect", xmin = 66, xmax= 160, ymin = 20, ymax = 105, alpha = 0.1, fill = "#33cc33") +
-                    annotate("text", label = paste0("Attempt to keep pressure below 105 psi for safety and comfort"),
-                             x = 67, y = 99, hjust = 0, vjust = -0.9, color = "#33cc33") +
-                    geom_line(size = 0.75, show.legend = FALSE) +
-                    expand_limits(x = 158) +
-                    geom_dl(aes(label = label), method = list("last.qp", cex = 1, hjust = -0.05),
-                            color = "Black") +
-                    annotate("text", label = credit_notice(), size = 3, x = 90, y = 23)
+base_inflation_plot <- ggplot(
+  inflation_data,
+  aes(
+    x = wheel_load_lbs,
+    y = tire_pressure_psi,
+    group = tire_size_mm,
+    color = tire_size_mm
+  )
+) +
+  theme_dg +
+  labs(title = "Optimized Bicycle Tire Pressure for 26, 650B, and 700C Sizes",
+       x = "Wheel Load", y = "Tire Pressure") +
+  #  theme(legend.position = c(0.08, 0.735), legend.justification = c(0, 1)) +
+  theme(aspect.ratio = 0.66) +
+  scale_color_brewer(name = "Tire Size (mm)",
+                     type = "seq",
+                     palette = "Set1") +
+  scale_x_continuous(breaks = seq(floor(min(
+    inflation_data$wheel_load_lbs
+  ) / 10) * 10,
+  ceiling(max(
+    inflation_data$wheel_load_lbs
+  ) / 10) * 10, 10),
+  label = dual_weight) +
+  scale_y_continuous(breaks = seq(20, 160, 10), label = dual_pressure) +
+  coord_cartesian(ylim = c(20, 150)) +
+  # annotate("rect", xmin = 66, xmax= 160, ymin = 20, ymax = 105, alpha = 0.1, fill = "#33cc33") +
+  # annotate("text", label = paste0("Attempt to keep pressure below 105 psi for safety and comfort"),
+  #          x = 67, y = 99, hjust = 0, vjust = -0.9, color = "#33cc33") +
+  geom_line(size = 0.55, show.legend = FALSE) +
+  expand_limits(x = 158) +
+  geom_dl(
+    aes(label = label),
+    method = list("last.qp", cex = 1, hjust = -0.05),
+    color = "#222222"
+  ) +
+  annotate(
+    "text",
+    label = credit_notice(),
+    size = 3,
+    x = 90,
+    y = 23
+  )
 
 
 display_bike_inflation <- function (base_plot = base_inflation_plot, bike) {
