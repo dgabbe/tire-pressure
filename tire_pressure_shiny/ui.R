@@ -1,10 +1,11 @@
-library(shiny)
 library(btpress)
+library(shiny)
+# library(shinythemes)
 
 slider_width <- "250px"
 
 shinyUI(
-  fluidPage(
+  fluidPage( # theme = shinytheme("yeti"),
     tags$head(includeScript("google-analytics.js")),
 
     titlePanel(title = "", windowTitle = "Optimizing Your Tire Pressure to Your Weight"),
