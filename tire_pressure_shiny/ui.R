@@ -24,11 +24,11 @@ shinyUI(
           ),
         fluidRow(
           column(12,
-                 sliderInput("bike_weight", label = "Bike Weight:", min = 10, max = 50, value = c(15), width = slider_width))
+          sliderInput("bike_weight", label = "Bike Weight:", min = 10, max = 50, value = c(15), width = slider_width))
           ),
         fluidRow(
           column(12,
-                 sliderInput("load_weight", label = "Load Weight:", min = 0, max = 75, value = c(13), width = slider_width))
+          sliderInput("load_weight", label = "Load Weight:", min = 0, max = 75, value = c(13), width = slider_width))
           ),
         fluidRow(
           column(12,
@@ -36,22 +36,36 @@ shinyUI(
                       min = 35, max = 70, step = 5, value = c(40), width = slider_width))
           ),
         fluidRow(
-          column(4,
-                 selectInput("front_tire", label = "Front Tire Size (mm):",
-                             choices = btpress::tire_sizes_mm, selected = 28,
-                             width = dropdown_width, selectize = FALSE)),
-          column(7,
-                 checkboxInput("front_casing_extralight", "Extra Light Casing", FALSE))
-          ),
-        fluidRow(
-          column(4,
-                 selectInput("rear_tire", label = 'Rear Tire Size (mm):',
-                             choices = btpress::tire_sizes_mm, selected = 28,
-                             width = dropdown_width, selectize = FALSE)),
-          column(7,
-                 checkboxInput("rear_casing_extralight", "Extra Light Casing", FALSE)))
+          column(
+            12,
+            wellPanel(
+              fluidRow(
+                column(12, h5('Tire Sizes (mm)', align = "left", style="font-weight: bold;"))
+              ),
+              fluidRow(
+                column(5,
+                       selectInput("front_tire", label = "Front:",
+                                   choices = btpress::tire_sizes_mm, selected = 28,
+                                   width = dropdown_width, selectize = FALSE)),
+                column(7,
+                       checkboxInput("front_casing_extralight", "Extra Light Casing", FALSE))
+              ),
+              fluidRow(
+                column(
+                  5,
+                  selectInput("rear_tire", label = 'Rear:',
+                              choices = btpress::tire_sizes_mm, selected = 28,
+                              width = dropdown_width, selectize = FALSE)),
+                column(
+                  7,
+                  checkboxInput("rear_casing_extralight", "Extra Light Casing", FALSE)
+                )
+              )
+            )
+          ) # wellPanel
+        )
       ),
       mainPanel(width = 9, plotOutput("inflation_plot"))
     )
   )
-)
+) # shinyUI
