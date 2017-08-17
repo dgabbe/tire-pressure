@@ -7,6 +7,7 @@ dropdown_width <- "50px"
 
 tire_well <- function() {
   wellPanel(
+    style = "background-color: #ffffff;",
     fluidRow(
       column(12, h5('Tire Sizes (mm)', align = "left", style="font-weight: bold;"))
     ),
@@ -37,6 +38,7 @@ tire_well <- function() {
 
 bike_well <- function() {
   wellPanel(
+    style = "background-color: #ffffff;",
     fluidRow(
       column(
         12,
@@ -61,6 +63,7 @@ bike_well <- function() {
 
 rider_well <- function() {
   wellPanel(
+    style = "background-color: #ffffff;",
     fluidRow(
       column(
         12,
@@ -71,13 +74,15 @@ rider_well <- function() {
 }
 
 shinyUI(
-  fluidPage( # theme = shinytheme("yeti"),
+  fluidPage(
+    # theme = shinytheme("yeti"),
     tags$head(includeScript("google-analytics.js")),
 
     titlePanel(title = "", windowTitle = "Optimizing Your Tire Pressure to Your Weight"),
 
     sidebarLayout(
       sidebarPanel(
+        style = "background-color: #efefef;",
         width = 3,
         fluidRow(
           column(12, h4("Bicycle and Rider Information", align = "center"))
