@@ -39,7 +39,7 @@ bike_well <- function() {
         12,
         sliderInput(
           "bike_weight",
-          label = "Bike Weight:",
+          label = "Bicycle Weight:",
           min = min_bike_lbs,
           max = max_bike_lbs,
           value = c(bike_ui$bike_lbs),
@@ -158,7 +158,7 @@ shinyUI(
   fluidPage(
     # theme = shinytheme("yeti"),
     tags$head(includeScript("google-analytics.js")),
-    titlePanel(title = "", windowTitle = "Optimizing Your Tire Pressure to Your Weight"),
+    titlePanel(title = "", windowTitle = app_title),
 
     sidebarLayout(
       sidebarPanel(
@@ -168,7 +168,7 @@ shinyUI(
           column(12, h4("Bicycle and Rider Information", align = "center"))
         ),
         fluidRow(
-          column(12, helpText("Use at your own risk.", style = "color: black;"))
+          column(12, helpText("Use at your own risk.", style = "color: black; text-align: center;"))
         ),
         rider_well(),
         bike_well(),

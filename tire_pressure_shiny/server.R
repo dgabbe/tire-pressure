@@ -21,7 +21,7 @@ shinyServer(
         rear_tire_size_mm = as.numeric(input$rear_tire),
         rear_tire_casing_compensation = tire_casing_indicator(input$rear_extralight)
       )
-      plot_bike_inflation(bike = bike)
+      plot_bike_inflation(bike = bike, show_summary = TRUE)
     },
     height = 800)
   }

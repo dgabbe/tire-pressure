@@ -39,7 +39,7 @@ tt_style <- function(tip) {
 
 tt_rider_weight <- tt_style("Weight of rider, as dressed for ride including shoes.")
 
-tt_bike_weight <- tt_style("Weight of bike with permanently attached accessories.")
+tt_bike_weight <- tt_style("Weight of bicycle with permanently attached accessories.")
 
 tt_load_weight <- tt_style("Weight of items like pump, lock, water bottles, and backpack, bag, pannier and their contents.")
 
