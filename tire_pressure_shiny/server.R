@@ -3,7 +3,7 @@ library(btpress)
 
 tire_casing_indicator <- function(checkbox) {
   return(
-    if (checkbox == TRUE) {1.15}
+    if (isTRUE(checkbox)) {extralight_compensation}
     else {1}
   )
 }
@@ -12,7 +12,7 @@ shinyServer(
   function(input, output) {
     output$inflation_plot <- renderPlot({
       bike <- bike_tire_pressures(
-        rider_weight_lbs = input$rider_weight,
+        rider_weight_lbs = input$ag_rider_weight,
         bike_weight_lbs = input$bike_weight,
         load_lbs = input$load_weight,
         front_distribution = (input$front_distribution / 100),
