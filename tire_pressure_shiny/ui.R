@@ -15,7 +15,7 @@ rider_well <- function() {
         12,
         style = "margin-bottom: 0px; border: 0px;",
         sliderInput(
-          "ag_rider_weight",
+          "rider_weight",
           label = "Rider Weight:",
           min = min_rider_lbs,
           max = max_rider_lbs,
@@ -23,9 +23,7 @@ rider_well <- function() {
           width = slider_width
         ),
         bsTooltip(
-          id = "ag_rider_weight",
-          title = '<div style="text-align:left; width: 200px;">Your weight as dressed for riding</div>',
-          placement = "right"
+          id = "rider_weight", title = tt_rider_weight, placement = "right"
         )
       )
     )
@@ -46,6 +44,9 @@ bike_well <- function() {
           max = max_bike_lbs,
           value = c(bike_ui$bike_lbs),
           width = slider_width
+        ),
+        bsTooltip(
+          id = "bike_weight", title = tt_bike_weight, placement = "right"
         )
       )
     ),
@@ -60,6 +61,9 @@ bike_well <- function() {
           max = max_load_lbs,
           value = c(bike_ui$load_lbs),
           width = slider_width
+        ),
+        bsTooltip(
+          "load_weight", title = tt_load_weight, placement = "right"
         )
       )
     ),
@@ -69,12 +73,15 @@ bike_well <- function() {
         12,
         sliderInput(
           "front_distribution",
-          label = "Front Wheel Load (%):",
+          label = "Load Distribution (Front %):",
           min = min_distribution,
           max = max_distribution,
           step = 5,
           value = c(bike_ui$distribution),
           width = slider_width
+        ),
+        bsTooltip(
+          "front_distribution", title = tt_load_distribution, placement = "right"
         )
       )
     )
@@ -112,12 +119,12 @@ tire_well <- function() {
       column(
         8,
         style = "padding-top: 17px;",
-        valign = "center",
         checkboxInput(
-          "front_casing_extralight",
+          "front_extralight",
           "Extra Light Casing",
           bike_ui$front_extralight
-        )
+        ),
+        bsTooltip("front_extralight", title = tt_extralight, placement = "right")
       )
     ),
     fluidRow(
@@ -137,10 +144,11 @@ tire_well <- function() {
         8,
         style = "padding-top: 17px;",
         checkboxInput(
-          "rear_casing_extralight",
+          "rear_extralight",
           "Extra Light Casing",
           bike_ui$rear_extralight
-        )
+        ),
+        bsTooltip("rear_extralight", title = tt_extralight, placement = "right")
       )
     )
   )

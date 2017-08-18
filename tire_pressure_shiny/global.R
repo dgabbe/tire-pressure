@@ -28,4 +28,34 @@ bike_ui <- list(
   distribution = 40
 )
 
-# tt_rider_weight <- bsTooltip("tt-rider_weight", "Your weight, dressed for riding, in pounds", "right", options = list(container = "body"))
+# Setup Tool Tips
+tt_style <- function(tip) {
+  paste0(
+    '<div style="text-align:left; width: 200px;">',
+    tip,
+    '</div>'
+  )
+}
+
+tt_rider_weight <- tt_style("Weight of rider, as dressed for ride including shoes.")
+
+tt_bike_weight <- tt_style("Weight of bike with permanently attached accessories.")
+
+tt_load_weight <- tt_style("Weight of items like pump, lock, water bottles, and backpack, bag, pannier and their contents.")
+
+tt_load_distribution <- tt_style(
+  paste0(
+    "Weight distribution between front & rear wheels.<br>",
+    '<ul style="padding-left:20px">',
+    "<li><b>Commuter, rear load:</b> 35%</li>",
+    "<li><b>Touring, rear load:</b> 35%</li>",
+    "<li><b>Racer, no load:</b> 40%</li>",
+      "<li><b>Randonneur, front load:</b> 45%</li>",
+      "<li><b>Time Trial:</b> 65%</li>",
+    "</ul>"
+  )
+)
+
+tt_extralight <- tt_style(
+  "Check if tire casing is very flexible.<br>Leave unchecked if unknown or unsure."
+)
